@@ -1,9 +1,12 @@
 require("dotenv").config()
 var createError = require("http-errors")
 var express = require("express")
+const session = require("express-session")
 var path = require("path")
 var cookieParser = require("cookie-parser")
 var logger = require("morgan")
+const passport = require("passport")
+const pool = require("./db/pool")
 
 var indexRouter = require("./routes/index")
 var usersRouter = require("./routes/users")
@@ -19,6 +22,24 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: new (require("connect-pg-simple")(session))({
+            // Insert connect-pg-simple options here
+            pool: pool,
+            createTableIfMissing: true,
+        }),
+        cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
+    })
+)
+
+// Init passport
+require("./passport/passportSetup")
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use("/", indexRouter)
 app.use("/users", usersRouter)
