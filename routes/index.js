@@ -3,8 +3,9 @@ const createHttpError = require("http-errors")
 var router = express.Router()
 const { body, validationResult, matchedData } = require("express-validator")
 const db = require("../db/queries")
-const bcrypt = require("bcryptjs")
 const debug = require("debug")("router:index")
+const { hashPassword } = require("../utils/hashPasswordSanitizer")
+const passport = require("passport")
 
 router.get("/sign-up", function (req, res, next) {
     res.render("sign-up", { title: "Sign up" })
@@ -44,14 +45,7 @@ router.post(
         body("confirmPassword").custom((value, { req }) => {
             return value === req.body.password
         }),
-        body("password").customSanitizer(async (value) => {
-            // Return hashed password
-            const salt = await bcrypt.genSalt(
-                Number(process.env.PASSWORD_SALT_LENGTH)
-            )
-            const hashedPassword = await bcrypt.hash(value, salt)
-            return hashedPassword
-        }),
+        body("password").customSanitizer(hashPassword),
     ],
     async function (req, res, next) {
         const errors = validationResult(req)
@@ -69,16 +63,55 @@ router.post(
             })
             debug(`New user created.\n${newUser}`)
 
-            res.redirect("/")
+            req.login(newUser, function (err) {
+                if (err) {
+                    return next(err)
+                }
+                return res.redirect("/")
+            })
         } catch (error) {
             throw createHttpError(500, error.message)
         }
     }
 )
 
+router.get("/sign-in", (req, res, next) => {
+    res.render("sign-in", { title: "Sign in", errors: req.session.messages })
+})
+
+router.post(
+    "/sign-in",
+    [
+        body(["email", "password"])
+            .exists()
+            .withMessage("Field is missing.")
+            .isString()
+            .notEmpty()
+            .withMessage("Field must not be empty.")
+            .isLength({ max: 255 })
+            .withMessage("Field is too long. Maximum 255 characters allowed."),
+        body("email").isEmail(),
+    ],
+    passport.authenticate("local", {
+        successRedirect: "/",
+        failureRedirect: "/sign-in",
+        failureMessage: true,
+    })
+)
+
+router.get("/sign-out", (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err)
+        }
+
+        res.redirect("/")
+    })
+})
+
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    res.render("index", { title: "Express" })
+    res.render("index", { title: "Express", user: req.user })
 })
 
 module.exports = router

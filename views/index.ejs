@@ -6,7 +6,14 @@
     </head>
     <body>
         <h1><%= title %></h1>
-        <p>Welcome to <%= title %></p>
-        <a href="/sign-up">Sign up</a>
+        <% if (!locals.user) { %>
+          <a href="/sign-in">Sign in</a>
+          <a href="/sign-up">Sign up</a>
+        <% } else { %>
+          <p>
+            Hello <%= locals.user.firstName %> <%= locals.user.lastName %> !
+          </p>
+          <a href="/sign-out">Sign out</a>
+        <% } %>
     </body>
 </html>
