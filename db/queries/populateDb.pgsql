@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    isMember BOOLEAN NOT NULL DEFAULT false,
-    isAdmin BOOLEAN NOT NULL DEFAULT false
+    is_club_member BOOLEAN NOT NULL DEFAULT false,
+    is_admin BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS messages (
