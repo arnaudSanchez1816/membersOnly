@@ -111,7 +111,7 @@ router.get("/sign-out", (req, res, next) => {
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    res.render("index", { title: "Express", user: req.user })
+    res.render("index", { title: "Express" })
 })
 
 module.exports = router
