@@ -10,6 +10,7 @@
     "tailwind": "npx @tailwindcss/cli -i ./stylesheets/style.css -o ./public/stylesheets/style.css --watch"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^17.2.1",
