@@ -1,18 +1,18 @@
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    email VARCHAR(255),
-    password VARCHAR(255),
-    isMember BOOLEAN,
-    isAdmin BOOLEAN
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    isMember BOOLEAN NOT NULL DEFAULT false,
+    isAdmin BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    timestamp TIMESTAMP WITH TIME ZONE,
-    title VARCHAR(255),
-    message VARCHAR(255),
-    author_id INTEGER,
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    author_id INTEGER NOT NULL,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id)
 );
