@@ -5,12 +5,20 @@
         <link rel="stylesheet" href="/stylesheets/style.css" />
     </head>
     <body>
+        <a href="/">Home</a>
         <h1><%= title %></h1>
         <div>
             <form action="/sign-in" method="post">
                 <div>
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" required />
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        required 
+                        <% if (locals.email) { %>
+                            value="<%= locals.email %>"
+                        <% } %>/>
                 </div>
                 <div>
                     <label for="password">Password</label>

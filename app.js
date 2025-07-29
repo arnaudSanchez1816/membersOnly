@@ -7,6 +7,8 @@ var cookieParser = require("cookie-parser")
 var logger = require("morgan")
 const passport = require("passport")
 const pool = require("./db/pool")
+const debug = require("debug")("membersOnly:http")
+const flash = require("connect-flash")
 
 var indexRouter = require("./routes/index")
 var usersRouter = require("./routes/users")
@@ -24,6 +26,7 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
 app.use(
     session({
+        name: "session",
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
@@ -35,6 +38,7 @@ app.use(
         cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
     })
 )
+app.use(flash())
 
 // Init passport
 require("./passport/passportSetup")
@@ -44,6 +48,12 @@ app.use(passport.session())
 // Add user to locals
 app.use((req, res, next) => {
     res.locals.user = req.user
+    next()
+})
+
+app.use((req, res, next) => {
+    // Add passport flash errors to locals
+    res.locals.errors = req.flash("error")
     next()
 })
 

@@ -5,12 +5,45 @@
         <link rel="stylesheet" href="/stylesheets/style.css" />
     </head>
     <body>
+        <a href="/">Home</a>
         <h1><%= title %></h1>
         <div>
             <form action="/sign-up" method="post">
                 <div>
+                    <label for="first-name">First Name</label>
+                    <input
+                        type="text"
+                        name="firstName"
+                        id="first-name"
+                        required
+                        <% if (locals.firstName) { %>
+                            value="<%= locals.firstName %>"
+                        <% } %>
+                    />
+                </div>
+                <div>
+                    <label for="last-name">Last Name</label>
+                    <input
+                        type="text"
+                        name="lastName"
+                        id="last-name"
+                        required
+                        <% if (locals.lastName) { %>
+                            value="<%= locals.lastName %>"
+                        <% } %>
+                    />
+                </div>
+                <div>
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" required />
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        required 
+                        <% if (locals.email) { %>
+                            value="<%= locals.email %>"
+                        <% } %>
+                    />
                 </div>
                 <div>
                     <label for="password">Password</label>
@@ -30,24 +63,14 @@
                         required
                     />
                 </div>
-                <div>
-                    <label for="first-name">First Name</label>
-                    <input
-                        type="text"
-                        name="firstName"
-                        id="first-name"
-                        required
-                    />
-                </div>
-                <div>
-                    <label for="last-name">Last Name</label>
-                    <input
-                        type="text"
-                        name="lastName"
-                        id="last-name"
-                        required
-                    />
-                </div>
+
+                <% if (errors) { %>
+                    <div>
+                        <% for( let i = 0; i < errors.length; i++ ) { %>
+                            <p><%= errors[i] %></p>
+                        <% } %>
+                    </div>
+                <% } %>
 
                 <button type="submit">Sign up</button>
             </form>

@@ -55,3 +55,14 @@ module.exports.getUserFromEmail = async function ({ email }) {
 
     return rows[0]
 }
+
+module.exports.setUserAsClubMember = async function ({ id }) {
+    await db.query(
+        `
+        UPDATE users
+        SET is_club_member = true
+        WHERE id = $1;
+        `,
+        [id]
+    )
+}

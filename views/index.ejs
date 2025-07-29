@@ -13,7 +13,23 @@
           <p>
             Hello <%= locals.user.firstName %> <%= locals.user.lastName %> !
           </p>
+          <div>
+            <h2>Membership status</h2>
+            <p>
+              <% if (locals.user.isAdmin) { %>
+                Administrator
+              <% } else if (locals.user.isClubMember) { %>
+                Club Member
+              <% } else { %>
+                User   
+              <% } %>
+            </p>
+          </div>
           <a href="/sign-out">Sign out</a>
+          <% if (!locals.user.isClubMember) { %>
+            <p>Join the exclusive member club !</p>
+            <a href="/join-club">Join the club</a>
+          <% } %>
         <% } %>
     </body>
 </html>
