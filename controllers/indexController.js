@@ -94,8 +94,15 @@ exports.postSignUp = [
 ]
 
 exports.getSignIn = (req, res, next) => {
-    res.render("sign-in", { title: "Sign in", email: req.query.email })
+    res.render("sign-in", {
+        title: "Sign in",
+        email: req.query.email,
+        redirectTo: req.query[BODY_SIGN_IN_REDIRECT_TO],
+    })
 }
+
+const BODY_SIGN_IN_REDIRECT_TO = "redirectTo"
+exports.BODY_SIGN_IN_REDIRECT_TO = BODY_SIGN_IN_REDIRECT_TO
 
 exports.postSignIn = [
     body(["email", "password"])
@@ -107,26 +114,55 @@ exports.postSignIn = [
         .isLength({ max: 255 })
         .withMessage("Field is too long. Maximum 255 characters allowed."),
     body("email").isEmail(),
+    // Optional query redirect relative url
+    body(BODY_SIGN_IN_REDIRECT_TO)
+        .optional()
+        .matches(/^(?!www\.|(?:http|ftp)s?:\/\/|[A-Za-z]:\\|\/\/).*/gm),
     (req, res, next) => {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
+        const errors = validationResult(req).array()
+
+        const invalidRedirectTo = errors.find(
+            (err) => err.path == BODY_SIGN_IN_REDIRECT_TO
+        )
+        if (errors.length === 1 && invalidRedirectTo) {
+            // Ignore invalid redirect to urls
+            return next()
+        }
+
+        if (errors.length > 0) {
             // Redirect validation errors
             req.flash(
                 "error",
-                errors.array().map((err) => err.msg)
+                errors
+                    .filter((err) => err.path !== BODY_SIGN_IN_REDIRECT_TO)
+                    .map((err) => err.msg)
             )
             const queryParams = new URLSearchParams()
             queryParams.append("email", req.body.email)
+            if (req.body[req.body[BODY_SIGN_IN_REDIRECT_TO]]) {
+                queryParams.append(
+                    BODY_SIGN_IN_REDIRECT_TO,
+                    req.body[BODY_SIGN_IN_REDIRECT_TO]
+                )
+            }
             return res.redirect(`/sign-in?${queryParams.toString()}`)
         }
 
+        // Assign redirect url
+        req.redirectTo = req.body[BODY_SIGN_IN_REDIRECT_TO]
         next()
     },
     passport.authenticate("local", {
-        successRedirect: "/",
         failWithError: true,
         failureFlash: true,
     }),
+    (req, res, next) => {
+        if (req.redirectTo) {
+            return res.redirect(req.redirectTo)
+        }
+
+        res.redirect("/")
+    },
     (error, req, res, next) => {
         // Redirect authenticate error
         const queryParams = new URLSearchParams()
@@ -147,7 +183,9 @@ exports.getSignOut = (req, res, next) => {
 
 exports.getJoinClub = (req, res, next) => {
     if (!req.user) {
-        return res.redirect("/sign-in")
+        const queryParams = new URLSearchParams()
+        queryParams.append(BODY_SIGN_IN_REDIRECT_TO, "/join-club")
+        return res.redirect(`/sign-in?${queryParams.toString()}`)
     }
 
     res.render("join-club", { title: "Join club" })

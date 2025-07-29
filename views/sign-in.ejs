@@ -9,6 +9,9 @@
         <h1><%= title %></h1>
         <div>
             <form action="/sign-in" method="post">
+                <% if (locals.redirectTo) { %>
+                    <input type="hidden" name="redirectTo" value="<%= locals.redirectTo %>">
+                <% } %>
                 <div>
                     <label for="email">Email</label>
                     <input 
