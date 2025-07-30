@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/stylesheets/style.css" />
+    </head>
+    <body>
+        <a href="/">Home</a>
+        <h1><%= title %></h1>
+        <div>
+            <div>
+                <h2>Status</h2>
+                <p>
+                    <% if (user.isAdmin) { %>
+                        Administrator
+                    <% } else { %>
+                        Regular user  
+                    <% } %>
+                </p>
+            </div>
+
+            <% if (user.isAdmin) { %>
+                <p>Enter admin secret code to revoke admin rights.</p>
+                <form action="/revoke-admin" method="post">
+                    <div>
+                        <label for="admin-secret">Admin secret</label>
+                        <input
+                            type="password"
+                            name="adminSecret"
+                            id="admin-secret"
+                            required
+                        />
+                    </div>
+                    <button type="submit">Revoke admin rights</button>
+            <% } else { %>
+                <p>Enter admin secret code to obtain admin rights.</p>
+                <form action="/grant-admin" method="post">
+                    <div>
+                        <label for="admin-secret">Admin secret</label>
+                        <input
+                            type="password"
+                            name="adminSecret"
+                            id="admin-secret"
+                            required
+                        />
+                    </div>
+                    <button type="submit">Obtain admin rights</button>
+            <% } %>
+            <% if (errors) { %>
+                <div>
+                    <% for( let i = 0; i < errors.length; i++ ) { %>
+                        <p><%= errors[i] %></p>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </body>
+</html>

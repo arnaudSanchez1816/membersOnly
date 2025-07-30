@@ -67,6 +67,17 @@ module.exports.setUserAsClubMember = async function ({ id }) {
     )
 }
 
+module.exports.toggleUserAdminRights = async function ({ id, isAdmin }) {
+    await db.query(
+        `
+        UPDATE users
+        SET is_admin = $2
+        WHERE id = $1;
+        `,
+        [id, isAdmin]
+    )
+}
+
 module.exports.addNewMessage = async function ({
     title,
     content,

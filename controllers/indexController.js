@@ -235,3 +235,57 @@ exports.postJoinClub = [
 exports.getHome = function (req, res, next) {
     res.render("index", { title: "Express" })
 }
+
+exports.getAdmin = (req, res, next) => {
+    if (!req.user) {
+        throw createHttpError(401)
+    }
+
+    res.render("admin", { title: "Administrator rights" })
+}
+
+exports.postGrantAdmin = [
+    body("adminSecret")
+        .exists()
+        .notEmpty()
+        .withMessage("Admin code is required.")
+        .custom((value) => value === process.env.ADMIN_SECRET)
+        .withMessage("Admin code is invalid."),
+    async (req, res, next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            req.flash("error", errors.formatWith((err) => err.msg).array())
+            return res.redirect("/admin")
+        }
+
+        try {
+            await db.toggleUserAdminRights({ id: req.user.id, isAdmin: true })
+            return res.redirect("/admin")
+        } catch (error) {
+            throw createHttpError(500, error.message)
+        }
+    },
+]
+
+exports.postRevokeAdmin = [
+    body("adminSecret")
+        .exists()
+        .notEmpty()
+        .withMessage("Admin code is required.")
+        .custom((value) => value === process.env.ADMIN_SECRET)
+        .withMessage("Admin code is invalid."),
+    async (req, res, next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            req.flash("error", errors.formatWith((err) => err.msg).array())
+            return res.redirect("/admin")
+        }
+
+        try {
+            await db.toggleUserAdminRights({ id: req.user.id, isAdmin: false })
+            return res.redirect("/admin")
+        } catch (error) {
+            throw createHttpError(500, error.message)
+        }
+    },
+]

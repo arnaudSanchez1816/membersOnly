@@ -9,6 +9,9 @@ const {
     getJoinClub,
     postJoinClub,
     getHome,
+    getAdmin,
+    postGrantAdmin,
+    postRevokeAdmin,
 } = require("../controllers/indexController")
 
 // Sign up
@@ -22,6 +25,10 @@ router.get("/sign-out", getSignOut)
 // Join Club
 router.get("/join-club", getJoinClub)
 router.post("/join-club", postJoinClub)
+// Admin
+router.get("/admin", getAdmin)
+router.post("/grant-admin", postGrantAdmin)
+router.post("/revoke-admin", postRevokeAdmin)
 // Home page
 router.get("/", getHome)
 
