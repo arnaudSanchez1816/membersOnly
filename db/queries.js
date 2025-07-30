@@ -97,11 +97,21 @@ module.exports.addNewMessage = async function ({
 
 module.exports.getAllMessages = async function () {
     const { rows } = await db.query(`
-        SELECT title, message as content, timestamp, to_jsonb(users) as author
+        SELECT messages.id, title, message as content, timestamp, to_jsonb(users) as author
         FROM messages
         JOIN users ON author_id = users.id
         ORDER BY timestamp DESC;
         `)
 
     return rows
+}
+
+module.exports.deleteMessage = async ({ id }) => {
+    await db.query(
+        `
+        DELETE FROM messages
+        WHERE id = $1;
+        `,
+        [id]
+    )
 }

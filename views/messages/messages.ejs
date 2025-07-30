@@ -8,23 +8,30 @@
         <a href="/">Home</a>
         <h1><%= title %></h1>
         <div>
-            <% locals.messages.forEach(msg => { %>
-                <div>
-                    <% if (locals.user.isClubMember || locals.user.isAdmin) { %>
-                        <div>
-                            <p><%= `${msg.author.firstName} ${msg.author.lastName}` %></p>
-                            <p><%= msg.timestamp.toString() %></p>
-                        </div>
-                        <div>
-                            <% if (locals.user.isAdmin) { %>
-                                <a href="/messages/delete/<%= msg.id %>">Delete</a>
-                            <% } %>
-                        </div>
-                    <% } %>
-                    <p><%= msg.title %></p>
-                    <p><%= msg.content %></p>
-                </div>
-            <% }) %>
+            <% if (locals.messages.length > 0) { %>
+                <% locals.messages.forEach(msg => { %>
+                    <div>
+                        <% if (locals.user.isClubMember || locals.user.isAdmin) { %>
+                            <div>
+                                <p><%= `${msg.author.firstName} ${msg.author.lastName}` %></p>
+                                <p><%= msg.timestamp.toString() %></p>
+                            </div>
+                            <div>
+                                <% if (locals.user.isAdmin) { %>
+                                    <% console.log(msg);
+                                     %>
+                                    <a href="/messages/delete?id=<%= msg.id %>">Delete</a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                        <p><%= msg.title %></p>
+                        <p><%= msg.content %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No messages.</p>
+            <% } %>
+
         </div>
     </body>
 </html>

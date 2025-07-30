@@ -1,6 +1,11 @@
 const createHttpError = require("http-errors")
 const { BODY_SIGN_IN_REDIRECT_TO } = require("./indexController")
-const { body, validationResult, matchedData } = require("express-validator")
+const {
+    body,
+    validationResult,
+    matchedData,
+    query,
+} = require("express-validator")
 const db = require("../db/queries")
 const debug = require("debug")("membersOnly:router:messages")
 
@@ -67,3 +72,39 @@ exports.getMessages = async (req, res, next) => {
         throw createHttpError(500, error.message)
     }
 }
+
+exports.getDeleteMessage = [
+    (req, rest, next) => {
+        if (!req.user || !req.user.isAdmin) {
+            throw createHttpError(
+                401,
+                "You do not have permissions to delete messages."
+            )
+        }
+        next()
+    },
+    query("id")
+        .trim()
+        .escape()
+        .exists()
+        .isInt()
+        .withMessage("Invalid message id")
+        .toInt(),
+    async (req, res, next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            throw createHttpError(
+                400,
+                errors.formatWith((err) => err.msg).array()
+            )
+        }
+
+        const { id } = matchedData(req)
+        try {
+            await db.deleteMessage({ id })
+            res.redirect("/messages")
+        } catch (error) {
+            throw createHttpError(500, error.message)
+        }
+    },
+]
