@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/stylesheets/style.css" />
+    </head>
+    <body>
+        <a href="/">Home</a>
+        <h1><%= title %></h1>
+        <div>
+            <% locals.messages.forEach(msg => { %>
+                <div>
+                    <% if (locals.user.isClubMember || locals.user.isAdmin) { %>
+                        <div>
+                            <p><%= `${msg.author.firstName} ${msg.author.lastName}` %></p>
+                            <p><%= msg.timestamp.toString() %></p>
+                        </div>
+                        <div>
+                            <% if (locals.user.isAdmin) { %>
+                                <a href="/messages/delete/<%= msg.id %>">Delete</a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                    <p><%= msg.title %></p>
+                    <p><%= msg.content %></p>
+                </div>
+            <% }) %>
+        </div>
+    </body>
+</html>

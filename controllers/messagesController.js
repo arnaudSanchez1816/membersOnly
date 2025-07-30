@@ -55,3 +55,15 @@ exports.postNewMessage = [
         }
     },
 ]
+
+exports.getMessages = async (req, res, next) => {
+    try {
+        const messages = await db.getAllMessages()
+        res.render("messages/messages", {
+            title: "All messages",
+            messages: messages,
+        })
+    } catch (error) {
+        throw createHttpError(500, error.message)
+    }
+}
