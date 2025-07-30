@@ -66,3 +66,20 @@ module.exports.setUserAsClubMember = async function ({ id }) {
         [id]
     )
 }
+
+module.exports.addNewMessage = async function ({
+    title,
+    content,
+    timestamp,
+    authorId,
+}) {
+    const { rows } = await db.query(
+        `
+        INSERT INTO messages(title, message, timestamp, author_id)
+        VALUES($1, $2, $3, $4) RETURNING id;
+        `,
+        [title, content, timestamp, authorId]
+    )
+
+    return rows[0].id
+}
